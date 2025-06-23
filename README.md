@@ -25,8 +25,8 @@ A Neovim plugin that automatically switches to English input method when leaving
   "guohao117/noime.nvim",
   event = "VeryLazy",
   cond = function()
-    -- Only load in WezTerm environment
-    return vim.env.WEZTERM_PANE ~= nil
+    -- Load in WezTerm environment (both local and remote sessions)
+    return vim.env.WEZTERM_PANE ~= nil or (vim.env.TERM and vim.env.TERM:match("wezterm"))
   end,
   opts = {
     debug = false,
@@ -152,13 +152,13 @@ return config
 
 1. **Check WezTerm**: Ensure you're running the plugin in WezTerm terminal
 2. **Verify ime-helper**: Make sure wezterm-ime-helper plugin is installed and configured
-3. **Environment variable**: The plugin only loads when `WEZTERM_PANE` environment variable is present
+3. **Environment detection**: The plugin loads when either `WEZTERM_PANE` environment variable is present (local) or `TERM` contains "wezterm" (remote sessions)
 
 ### Commands not available
 
 If the commands are not available, the plugin might not have loaded. Check:
 
-- You're running in WezTerm (check `echo $WEZTERM_PANE`)
+- You're running in WezTerm (check `echo $WEZTERM_PANE` or `echo $TERM`)
 - The plugin is properly installed
 - No errors in `:messages`
 
