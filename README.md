@@ -143,8 +143,39 @@ ime_helper.apply_to_config(config, {
   -- Configuration options for wezterm-ime-helper
 })
 
+-- Set TERM to include "wezterm" for remote session detection
+config.term = "wezterm"
+
 return config
 ```
+
+### Remote Session Setup
+
+For the plugin to work in remote sessions (SSH), you need to:
+
+1. **Configure WezTerm TERM**: Set `config.term = "wezterm"` in your WezTerm configuration (as shown above)
+
+2. **SSH Configuration**: The `TERM` environment variable will be automatically passed through SSH, allowing the remote Neovim to detect it's running in WezTerm
+
+3. **Tmux Configuration**: If you're using tmux in remote sessions, add this to your `~/.tmux.conf` to allow OSC sequences to pass through:
+   ```bash
+   # Allow OSC sequences to pass through tmux
+   set -g allow-passthrough on
+   
+   # Alternative for older tmux versions
+   # set -ga terminal-overrides ',*:Tc'
+   ```
+
+4. **Verify Detection**: On the remote server, you can verify the setup by checking:
+   ```bash
+   echo $TERM  # Should output "wezterm"
+   ```
+
+This approach allows the plugin to work seamlessly in both local and remote sessions by detecting the WezTerm environment through either:
+- `WEZTERM_PANE` environment variable (local sessions)
+- `TERM` environment variable containing "wezterm" (remote sessions)
+
+The OSC 1337 escape sequences will pass through SSH and tmux (with proper configuration) to reach WezTerm for IME control.
 
 ## Troubleshooting
 
@@ -153,6 +184,7 @@ return config
 1. **Check WezTerm**: Ensure you're running the plugin in WezTerm terminal
 2. **Verify ime-helper**: Make sure wezterm-ime-helper plugin is installed and configured
 3. **Environment detection**: The plugin loads when either `WEZTERM_PANE` environment variable is present (local) or `TERM` contains "wezterm" (remote sessions)
+4. **Tmux passthrough**: If using tmux, ensure `allow-passthrough on` is set in your tmux configuration
 
 ### Commands not available
 
