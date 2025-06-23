@@ -4,8 +4,9 @@ if vim.g.loaded_wezterm_ime_helper then
 end
 vim.g.loaded_wezterm_ime_helper = 1
 
--- Only load if in WezTerm
-if not vim.env.WEZTERM_PANE then
+-- Only load if in WezTerm (support both local and remote sessions)
+local is_wezterm = vim.env.WEZTERM_PANE or (vim.env.TERM and vim.env.TERM:match("wezterm"))
+if not is_wezterm then
   return
 end
 

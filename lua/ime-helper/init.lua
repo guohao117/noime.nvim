@@ -14,6 +14,10 @@ local state = {
 }
 
 -- Utility functions
+local function is_wezterm_env()
+  return vim.env.WEZTERM_PANE or (vim.env.TERM and vim.env.TERM:match("wezterm"))
+end
+
 local function log(msg)
   if config.debug then
     print("[IME Helper] " .. msg)
@@ -22,7 +26,9 @@ end
 
 -- Core IME switching via WezTerm OSC sequences
 local function send_ime_command(ime_state)
-  if not vim.env.WEZTERM_PANE then
+  -- Check for WezTerm environment - support both local and remote sessions
+  if not is_wezterm_env() then
+    log("Not in WezTerm environment, skipping IME command")
     return
   end
   
@@ -145,7 +151,7 @@ function M.setup(opts)
     return
   end
   
-  if not vim.env.WEZTERM_PANE then
+  if not is_wezterm_env() then
     if opts and opts.debug then
       vim.notify("[IME Helper] Not in WezTerm, disabled", vim.log.levels.WARN)
     end
@@ -179,7 +185,9 @@ function M.status()
     setup_done = state.setup_done,
     current_mode = state.current_mode,
     is_insert_mode = state.is_insert_mode,
-    wezterm_detected = vim.env.WEZTERM_PANE ~= nil,
+    wezterm_pane = vim.env.WEZTERM_PANE,
+    term_env = vim.env.TERM,
+    is_wezterm_env = is_wezterm_env(),
     config = config,
   }
   print("IME Helper Status:")
